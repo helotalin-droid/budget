@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>إدارة الميزانية والديون</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="الميزانية" />
+  <meta name="theme-color" content="#141817" />
+  <link id="apple-icon" rel="apple-touch-icon" href="" />
+  <style>
+    :root {
+      --bg-app: #141817;
+      --bg-card: #f7f4ef;
+      --bg-panel: #1f2523;
+      --text-main: #ffffff;
+      --text-dark: #1d2120;
+      --text-muted: #6c7270;
+      --accent-primary: #1b3b2b;
+      --c1: #b85d43;
+      --c2: #4f646f;
+      --c3: #5b7065;
+      --c4: #b58d3d;
+      --c5: #6d597a;
+      --border-subtle: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Arabic", "Segoe UI", Tahoma, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(181, 141, 61, 0.07) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(255,255,255,0.02) 25%, transparent 25%),
+        linear-gradient(225deg, rgba(255,255,255,0.02) 25%, transparent 25%);
+      color: var(--text-main);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: calc(95px + env(safe-area-inset-bottom));
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 440px;
+      padding: 16px 16px 24px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .topbar h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .theme-pill {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .overview-card {
+      background: var(--bg-card);
+      color: var(--text-dark);
+      border-radius: 24px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.28);
+      margin-bottom: 16px;
+    }
+
+    .overview-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .overview-total {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      direction: ltr;
+    }
+
+    .overview-bar {
+      background: var(--accent-primary);
+      color: #ffffff;
+      border-radius: 14px;
+      padding: 11px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .cat-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .cat-card:active {
+      transform: scale(0.97);
+    }
+
+    .cat-header {
+      padding: 10px 12px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cat-body {
+      padding: 14px 12px;
+      color: var(--text-dark);
+      text-align: center;
+    }
+
+    .cat-amount {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .cat-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .recent-box {
+      background: var(--bg-card);
+      border-radius: 22px;
+      overflow: hidden;
+      color: var(--text-dark);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.24);
+    }
+
+    .recent-header {
+      background: var(--c4);
+      color: #1d2120;
+      padding: 11px 16px;
+      font-weight: 800;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tx-list {
+      padding: 8px 14px;
+    }
+
+    .tx-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+    }
+
+    .tx-item:last-child {
+      border-bottom: none;
+    }
+
+    .tx-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tx-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .tx-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .tx-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .tx-amount {
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .panel h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: #c8cecc;
+      margin-bottom: 4px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    select option {
+      background: #1f2523;
+      color: #ffffff;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 12px;
+      background: var(--accent-primary);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-danger {
+      background: #a83838;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+    }
+
+    .debt-card {
+      background: var(--bg-card);
+      color: var(--text-dark);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .debt-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .debt-name {
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .debt-badge {
+      background: var(--c2);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .debt-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: rgba(0,0,0,0.05);
+      padding: 8px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .debt-stats strong {
+      display: block;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .debt-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .themes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .theme-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 10px;
+      color: #fff;
+      text-align: right;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .theme-btn.active {
+      border: 2px solid var(--c4);
+      background: rgba(255,255,255,0.15);
+    }
+
+    .swatches {
+      display: flex;
+      gap: 3px;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-card);
+      border-top-left-radius: 22px;
+      border-top-right-radius: 22px;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -6px 24px rgba(0,0,0,0.35);
+      z-index: 100;
+    }
+
+    .nav-item {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .nav-item.active {
+      color: var(--accent-primary);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="topbar">
+      <h1>إدارة الميزانية والديون</h1>
+      <button class="theme-pill" onclick="switchTab('settings')" id="currentThemeName">ترابي رخامي</button>
+    </div>
+
+    <!-- الشاشة الرئيسية -->
+    <div id="screen-home" class="screen active">
+      <div class="overview-card">
+        <div class="overview-label">نظرة عامة على الميزانية</div>
+        <div class="overview-total" id="displayBudget">10,000 ر.س</div>
+        <div class="overview-bar">
+          <span>المتبقي الصافي</span>
+          <span id="displayRemaining">9,100 ر.س</span>
+        </div>
+      </div>
+
+      <div class="cards-grid" id="categoriesGrid"></div>
+
+      <div class="recent-box">
+        <div class="recent-header">
+          <span>العمليات الأخيرة</span>
+          <span id="txCountBadge" style="font-size:12px;font-weight:600;">3 عمليات</span>
+        </div>
+        <div class="tx-list" id="recentTxList"></div>
+      </div>
+    </div>
+
+    <!-- شاشة المصروفات والبنود -->
+    <div id="screen-expenses" class="screen">
+      <div class="panel">
+        <h2>إضافة بند / عملية جديدة</h2>
+        <div class="form-group">
+          <label>القسم</label>
+          <select id="txCategorySelect"></select>
+        </div>
+        <div class="form-group">
+          <label>وصف البند</label>
+          <input type="text" id="txTitleInput" placeholder="مثال: بقالة، فاتورة كهرباء، قسط..." />
+        </div>
+        <div class="form-group">
+          <label>المبلغ (ر.س)</label>
+          <input type="number" id="txAmountInput" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label>التاريخ</label>
+          <input type="date" id="txDateInput" />
+        </div>
+        <button class="btn" onclick="addTransaction()">حفظ العملية</button>
+      </div>
+
+      <div class="panel">
+        <h2>سجل جميع البنود والعمليات</h2>
+        <div id="allTxList"></div>
+      </div>
+    </div>
+
+    <!-- شاشة الديون التي أطلبها الناس -->
+    <div id="screen-debts" class="screen">
+      <div class="panel">
+        <h2>تسجيل دين جديد (أطلب شخص)</h2>
+        <div class="form-group">
+          <label>اسم الشخص المدين</label>
+          <input type="text" id="debtPersonInput" placeholder="مثال: محمد العتيبي" />
+        </div>
+        <div class="form-group">
+          <label>إجمالي المبلغ المطلوب (ر.س)</label>
+          <input type="number" id="debtTotalInput" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label>المبلغ المسدد حتى الآن (ر.س)</label>
+          <input type="number" id="debtPaidInput" placeholder="0" value="0" />
+        </div>
+        <div class="form-group">
+          <label>تاريخ السداد المتوقع / الفعلي</label>
+          <input type="date" id="debtDateInput" />
+        </div>
+        <div class="form-group">
+          <label>طريقة الدفع / السداد</label>
+          <select id="debtMethodInput">
+            <option value="حوالة بنكية">حوالة بنكية</option>
+            <option value="كاش (نقدي)">كاش (نقدي)</option>
+            <option value="شبكة / مدى">شبكة / مدى</option>
+            <option value="أقساط مجدولة">أقساط مجدولة</option>
+          </select>
+        </div>
+        <button class="btn" onclick="addDebt()">إضافة الدين للقائمة</button>
+      </div>
+
+      <div id="debtsContainer"></div>
+    </div>
+
+    <!-- شاشة الإعدادات والتخصيص الشامل -->
+    <div id="screen-settings" class="screen">
+      <div class="panel">
+        <h2>1. الثيمات الترابية والفاخرة (10 ثيمات)</h2>
+        <div class="themes-grid" id="themesGrid"></div>
+      </div>
+
+      <div class="panel">
+        <h2>2. الميزانية ومعادلة الحساب الرئيسية</h2>
+        <div class="form-group">
+          <label>إجمالي الميزانية الأساسية (ر.س)</label>
+          <input type="number" id="settingsBudgetInput" />
+        </div>
+        <div class="form-group">
+          <label>معادلة حساب المتبقي الصافي</label>
+          <select id="mainFormulaSelect">
+            <option value="budget_minus_all">الميزانية - مجموع كل الأقسام</option>
+            <option value="budget_minus_all_plus_debts_paid">الميزانية - الأقسام + الديون المسددة لي</option>
+            <option value="budget_minus_expenses_only">الميزانية - قسم المصروفات فقط</option>
+          </select>
+        </div>
+        <button class="btn" onclick="saveMainSettings()">تحديث الميزانية والمعادلة</button>
+      </div>
+
+      <div class="panel">
+        <h2>3. إدارة الأقسام والعناوين والمعادلات</h2>
+        <div class="form-group">
+          <label>اسم القسم الجديد</label>
+          <input type="text" id="newCatName" placeholder="مثال: التزامات، استثمار..." />
+        </div>
+        <div class="form-group">
+          <label>أيقونة القسم</label>
+          <input type="text" id="newCatIcon" placeholder="مثال: 💼 أو 🏠" value="📌" />
+        </div>
+        <div class="form-group">
+          <label>معادلة حساب القسم</label>
+          <select id="newCatFormula">
+            <option value="sum_items">مجموع بنود القسم</option>
+            <option value="debts_remaining">متبقي الديون التي أطلبها (تلقائي)</option>
+            <option value="debts_total">إجمالي الديون التي أطلبها (تلقائي)</option>
+            <option value="percent_10">10% من الميزانية الأساسية</option>
+            <option value="percent_20">20% من الميزانية الأساسية</option>
+          </select>
+        </div>
+        <button class="btn" onclick="addCategory()">إضافة القسم للواجهة</button>
+
+        <div id="manageCategoriesList" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- شريط التنقل السفلي -->
+  <nav class="nav-bar">
+    <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
+      <span class="nav-icon">🏠</span>
+      <span>الرئيسية</span>
+    </button>
+    <button class="nav-item" id="nav-expenses" onclick="switchTab('expenses')">
+      <span class="nav-icon">💳</span>
+      <span>البنود</span>
+    </button>
+    <button class="nav-item" id="nav-debts" onclick="switchTab('debts')">
+      <span class="nav-icon">🤝</span>
+      <span>الديون</span>
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="switchTab('settings')">
+      <span class="nav-icon">⚙️</span>
+      <span>الإعدادات</span>
+    </button>
+  </nav>
+
+  <script>
+    const THEMES = [
+      { id: 0, name: "ترابي رخامي (الأساسي)", bg: "#141817", card: "#f7f4ef", panel: "#1f2523", accent: "#1b3b2b", c1: "#b85d43", c2: "#4f646f", c3: "#5b7065", c4: "#b58d3d" },
+      { id: 1, name: "طين محروق وزيتوني", bg: "#1c1917", card: "#f5efe6", panel: "#292524", accent: "#4a5d4e", c1: "#c26d53", c2: "#6b705c", c3: "#8c6d53", c4: "#cb997e" },
+      { id: 2, name: "رمال الصحراء والكحلي", bg: "#111827", card: "#f8f5f0", panel: "#1e293b", accent: "#1e3a5f", c1: "#b08968", c2: "#3d5a80", c3: "#7f5539", c4: "#ddb892" },
+      { id: 3, name: "أخضر غابات وجوزي", bg: "#121a16", card: "#f4f1ea", panel: "#1c2822", accent: "#233d2e", c1: "#6f4e37", c2: "#3b5249", c3: "#8a6240", c4: "#a47551" },
+      { id: 4, name: "برقوقي ملكي وعاجي", bg: "#1d1118", card: "#faf6f2", panel: "#2d1b26", accent: "#4a1c34", c1: "#722f37", c2: "#5c4d7d", c3: "#8e5572", c4: "#c9a66b" },
+      { id: 5, name: "فحمي وخشب البلوط", bg: "#121212", card: "#f6f2eb", panel: "#1e1e1e", accent: "#2c2c2c", c1: "#9c6644", c2: "#586069", c3: "#7f5539", c4: "#b08968" },
+      { id: 6, name: "تيراكوتا ورمادي دافئ", bg: "#1f1a18", card: "#f7f3ee", panel: "#2e2724", accent: "#9e472a", c1: "#bc5d3b", c2: "#6c6863", c3: "#8b6b5d", c4: "#d4a373" },
+      { id: 7, name: "مريمية وعسل ذهبي", bg: "#161b18", card: "#f6f5ef", panel: "#222925", accent: "#3f5245", c1: "#586f60", c2: "#7d8570", c3: "#a68a64", c4: "#c29b40" },
+      { id: 8, name: "إسبريسو وكشمير", bg: "#1b1512", card: "#f5efe9", panel: "#2a211c", accent: "#4e342e", c1: "#6d4c41", c2: "#8d6e63", c3: "#5d4037", c4: "#bcaaa4" },
+      { id: 9, name: "أردوازي ونحاسي عتيق", bg: "#15191d", card: "#f3f4f6", panel: "#21272d", accent: "#2b3a4a", c1: "#a85d3b", c2: "#4a5d6e", c3: "#5c6b73", c4: "#c08552" }
+    ];
+
+    const DEFAULT_STATE = {
+      themeId: 0,
+      budget: 10000,
+      mainFormula: "budget_minus_all",
+      categories: [
+        { id: "cat_exp", name: "المصروفات", icon: "💳", colorKey: "c1", formula: "sum_items" },
+        { id: "cat_debt", name: "الديون", icon: "🤝", colorKey: "c2", formula: "debts_remaining" },
+        { id: "cat_sav1", name: "الادخار (المنزل)", icon: "🏠", colorKey: "c3", formula: "sum_items" },
+        { id: "cat_sav2", name: "الادخار (المواصلات)", icon: "🚗", colorKey: "c4", formula: "sum_items" }
+      ],
+      transactions: [
+        { id: 1, catId: "cat_sav1", title: "إيجار الشقة", amount: 500, date: "2026-11-20" },
+        { id: 2, catId: "cat_exp", title: "فاتورة الكهرباء", amount: 200, date: "2026-11-24" },
+        { id: 3, catId: "cat_exp", title: "بقالة العثيم", amount: 200, date: "2026-11-25" }
+      ],
+      debts: [
+        { id: 101, person: "سعد القحطاني", total: 2500, paid: 700, date: "2026-12-15", method: "حوالة بنكية" }
+      ]
+    };
+
+    let state = JSON.parse(localStorage.getItem("budget_app_v2")) || DEFAULT_STATE;
+
+    function saveState() {
+      localStorage.setItem("budget_app_v2", JSON.stringify(state));
+      renderAll();
+    }
+
+    function generateAppIcon() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext("2d");
+      const t = THEMES[state.themeId] || THEMES[0];
+
+      ctx.fillStyle = t.bg;
+      ctx.fillRect(0, 0, 512, 512);
+
+      ctx.fillStyle = t.c4;
+      ctx.beginPath();
+      ctx.roundRect(76, 96, 360, 320, 64);
+      ctx.fill();
+
+      ctx.fillStyle = t.accent;
+      ctx.beginPath();
+      ctx.roundRect(106, 136, 300, 110, 32);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 54px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("ر.س", 256, 210);
+
+      ctx.fillStyle = t.c1;
+      ctx.beginPath();
+      ctx.arc(176, 330, 36, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = t.c2;
+      ctx.beginPath();
+      ctx.arc(256, 330, 36, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = t.c3;
+      ctx.beginPath();
+      ctx.arc(336, 330, 36, 0, Math.PI * 2);
+      ctx.fill();
+
+      document.getElementById("apple-icon").href = canvas.toDataURL("image/png");
+    }
+
+    function applyTheme() {
+      const t = THEMES[state.themeId] || THEMES[0];
+      const r = document.documentElement.style;
+      r.setProperty("--bg-app", t.bg);
+      r.setProperty("--bg-card", t.card);
+      r.setProperty("--bg-panel", t.panel);
+      r.setProperty("--accent-primary", t.accent);
+      r.setProperty("--c1", t.c1);
+      r.setProperty("--c2", t.c2);
+      r.setProperty("--c3", t.c3);
+      r.setProperty("--c4", t.c4);
+      document.querySelector('meta[name="theme-color"]').setAttribute("content", t.bg);
+      document.getElementById("currentThemeName").textContent = t.name.split(" ")[0] + " " + (t.name.split(" ")[1] || "");
+      generateAppIcon();
+    }
+
+    function computeCategoryValue(cat) {
+      if (cat.formula === "debts_remaining") {
+        return state.debts.reduce((acc, d) => acc + Math.max(0, Number(d.total) - Number(d.paid)), 0);
+      }
+      if (cat.formula === "debts_total") {
+        return state.debts.reduce((acc, d) => acc + Number(d.total), 0);
+      }
+      if (cat.formula === "percent_10") {
+        return Math.round(state.budget * 0.10);
+      }
+      if (cat.formula === "percent_20") {
+        return Math.round(state.budget * 0.20);
+      }
+      return state.transactions
+        .filter(tx => tx.catId === cat.id)
+        .reduce((acc, tx) => acc + Number(tx.amount), 0);
+    }
+
+    function computeRemaining() {
+      const totalCats = state.categories.reduce((acc, c) => {
+        if (c.formula === "debts_remaining" || c.formula === "debts_total") return acc;
+        return acc + computeCategoryValue(c);
+      }, 0);
+
+      if (state.mainFormula === "budget_minus_all_plus_debts_paid") {
+        const paidDebts = state.debts.reduce((acc, d) => acc + Number(d.paid), 0);
+        return state.budget - totalCats + paidDebts;
+      }
+      if (state.mainFormula === "budget_minus_expenses_only") {
+        const expCat = state.categories[0];
+        const expVal = expCat ? computeCategoryValue(expCat) : 0;
+        return state.budget - expVal;
+      }
+      return state.budget - totalCats;
+    }
+
+    function renderHome() {
+      document.getElementById("displayBudget").textContent = Number(state.budget).toLocaleString() + " ر.س";
+      document.getElementById("displayRemaining").textContent = computeRemaining().toLocaleString() + " ر.س";
+
+      const grid = document.getElementById("categoriesGrid");
+      grid.innerHTML = "";
+      const colors = ["var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)"];
+
+      state.categories.forEach((cat, idx) => {
+        const val = computeCategoryValue(cat);
+        const bgCol = colors[idx % colors.length];
+        const subText = cat.formula.startsWith("debts") ? "متبقي الديون تلقائياً" : "مجموع البنود";
+
+        grid.innerHTML += `
+          <div class="cat-card" onclick="switchTab('${cat.formula.startsWith("debts") ? "debts" : "expenses"}')">
+            <div class="cat-header" style="background:${bgCol}">
+              <span>${cat.name}</span>
+              <span>${cat.icon}</span>
+            </div>
+            <div class="cat-body">
+              <div class="cat-amount">${val.toLocaleString()} ر.س</div>
+              <div class="cat-sub">${subText}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      const recentList = document.getElementById("recentTxList");
+      recentList.innerHTML = "";
+      const recent = [...state.transactions].reverse().slice(0, 5);
+      document.getElementById("txCountBadge").textContent = state.transactions.length + " عمليات";
+
+      recent.forEach(tx => {
+        const cat = state.categories.find(c => c.id === tx.catId) || { name: "عام", icon: "📌" };
+        recentList.innerHTML += `
+          <div class="tx-item">
+            <div class="tx-info">
+              <div class="tx-icon">${cat.icon}</div>
+              <div>
+                <div class="tx-title">${tx.title}</div>
+                <div class="tx-meta">${cat.name} • ${tx.date}</div>
+              </div>
+            </div>
+            <div class="tx-amount">${Number(tx.amount).toLocaleString()} ر.س</div>
+          </div>
+        `;
+      });
+    }
+
+    function renderExpenses() {
+      const sel = document.getElementById("txCategorySelect");
+      sel.innerHTML = "";
+      state.categories.filter(c => !c.formula.startsWith("debts")).forEach(c => {
+        sel.innerHTML += `<option value="${c.id}">${c.icon} ${c.name}</option>`;
+      });
+
+      const list = document.getElementById("allTxList");
+      list.innerHTML = "";
+      [...state.transactions].reverse().forEach(tx => {
+        const cat = state.categories.find(c => c.id === tx.catId) || { name: "عام", icon: "📌" };
+        list.innerHTML += `
+          <div class="tx-item" style="border-color:rgba(255,255,255,0.1)">
+            <div>
+              <div class="tx-title" style="color:#fff">${cat.icon} ${tx.title}</div>
+              <div class="tx-meta">${cat.name} • ${tx.date}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="tx-amount" style="color:#fff">${Number(tx.amount).toLocaleString()} ر.س</span>
+              <button class="btn-sm btn-danger" onclick="deleteTx(${tx.id})">حذف</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderDebts() {
+      const container = document.getElementById("debtsContainer");
+      container.innerHTML = "";
+      state.debts.forEach(d => {
+        const rem = Math.max(0, Number(d.total) - Number(d.paid));
+        container.innerHTML += `
+          <div class="debt-card">
+            <div class="debt-top">
+              <span class="debt-name">👤 ${d.person}</span>
+              <span class="debt-badge">${d.method}</span>
+            </div>
+            <div class="debt-stats">
+              <div>المطلوب<strong>${Number(d.total).toLocaleString()} ر.س</strong></div>
+              <div>المسدد<strong style="color:#1b6b3a">${Number(d.paid).toLocaleString()} ر.س</strong></div>
+              <div>المتبقي<strong style="color:#a83838">${rem.toLocaleString()} ر.س</strong></div>
+            </div>
+            <div class="debt-footer">
+              <span>📅 السداد: ${d.date || "غير محدد"}</span>
+              <div style="display:flex;gap:6px;">
+                <button class="btn-sm" style="background:var(--accent-primary);color:#fff" onclick="payDebtMore(${d.id})">+ تسجيل دفعة</button>
+                <button class="btn-sm btn-danger" onclick="deleteDebt(${d.id})">حذف</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderSettings() {
+      const tGrid = document.getElementById("themesGrid");
+      tGrid.innerHTML = "";
+      THEMES.forEach(t => {
+        tGrid.innerHTML += `
+          <button class="theme-btn ${state.themeId === t.id ? "active" : ""}" onclick="selectTheme(${t.id})">
+            <span>${t.name}</span>
+            <span class="swatches">
+              <span class="swatch" style="background:${t.c1}"></span>
+              <span class="swatch" style="background:${t.c2}"></span>
+              <span class="swatch" style="background:${t.c4}"></span>
+            </span>
+          </button>
+        `;
+      });
+
+      document.getElementById("settingsBudgetInput").value = state.budget;
+      document.getElementById("mainFormulaSelect").value = state.mainFormula;
+
+      const mList = document.getElementById("manageCategoriesList");
+      mList.innerHTML = "";
+      state.categories.forEach((cat, index) => {
+        mList.innerHTML += `
+          <div style="background:rgba(255,255,255,0.06);padding:10px;border-radius:12px;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <strong>${cat.icon} ${cat.name}</strong>
+              <button class="btn-sm btn-danger" onclick="deleteCategory(${index})">حذف</button>
+            </div>
+            <div class="row-actions">
+              <button class="btn-sm btn-secondary" onclick="renameCategory(${index})">تعديل الاسم</button>
+              <button class="btn-sm btn-secondary" onclick="changeCatFormula(${index})">تغيير المعادلة</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderAll() {
+      applyTheme();
+      renderHome();
+      renderExpenses();
+      renderDebts();
+      renderSettings();
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+      document.getElementById("screen-" + tab).classList.add("active");
+      document.getElementById("nav-" + tab).classList.add("active");
+    }
+
+    function selectTheme(id) {
+      state.themeId = id;
+      saveState();
+    }
+
+    function addTransaction() {
+      const catId = document.getElementById("txCategorySelect").value;
+      const title = document.getElementById("txTitleInput").value.trim();
+      const amount = Number(document.getElementById("txAmountInput").value);
+      const date = document.getElementById("txDateInput").value || new Date().toISOString().slice(0, 10);
+      if (!title || amount <= 0) return alert("يرجى إدخال الوصف والمبلغ بشكل صحيح");
+      state.transactions.push({ id: Date.now(), catId, title, amount, date });
+      document.getElementById("txTitleInput").value = "";
+      document.getElementById("txAmountInput").value = "";
+      saveState();
+      switchTab("home");
+    }
+
+    function deleteTx(id) {
+      state.transactions = state.transactions.filter(t => t.id !== id);
+      saveState();
+    }
+
+    function addDebt() {
+      const person = document.getElementById("debtPersonInput").value.trim();
+      const total = Number(document.getElementById("debtTotalInput").value);
+      const paid = Number(document.getElementById("debtPaidInput").value) || 0;
+      const date = document.getElementById("debtDateInput").value || new Date().toISOString().slice(0, 10);
+      const method = document.getElementById("debtMethodInput").value;
+      if (!person || total <= 0) return alert("يرجى إدخال اسم الشخص والمبلغ المطلوب");
+      state.debts.push({ id: Date.now(), person, total, paid, date, method });
+      document.getElementById("debtPersonInput").value = "";
+      document.getElementById("debtTotalInput").value = "";
+      document.getElementById("debtPaidInput").value = "0";
+      saveState();
+    }
+
+    function payDebtMore(id) {
+      const d = state.debts.find(x => x.id === id);
+      if (!d) return;
+      const add = Number(prompt("كم المبلغ الجديد الذي سدده " + d.person + "؟"));
+      if (add > 0) {
+        d.paid = Number(d.paid) + add;
+        const m = prompt("طريقة السداد (حوالة بنكية / كاش / شبكة):", d.method);
+        if (m) d.method = m;
+        saveState();
+      }
+    }
+
+    function deleteDebt(id) {
+      state.debts = state.debts.filter(d => d.id !== id);
+      saveState();
+    }
+
+    function saveMainSettings() {
+      const b = Number(document.getElementById("settingsBudgetInput").value);
+      if (b >= 0) state.budget = b;
+      state.mainFormula = document.getElementById("mainFormulaSelect").value;
+      saveState();
+      alert("تم تحديث الميزانية والمعادلة بنجاح");
+    }
+
+    function addCategory() {
+      const name = document.getElementById("newCatName").value.trim();
+      const icon = document.getElementById("newCatIcon").value.trim() || "📌";
+      const formula = document.getElementById("newCatFormula").value;
+      if (!name) return alert("اكتب اسم القسم");
+      state.categories.push({ id: "cat_" + Date.now(), name, icon, formula });
+      document.getElementById("newCatName").value = "";
+      saveState();
+    }
+
+    function renameCategory(idx) {
+      const newName = prompt("أدخل الاسم الجديد للقسم:", state.categories[idx].name);
+      if (newName && newName.trim()) {
+        state.categories[idx].name = newName.trim();
+        saveState();
+      }
+    }
+
+    function changeCatFormula(idx) {
+      const choice = prompt(
+        "اختر رقم المعادلة:
+1 = مجموع بنود القسم
+2 = متبقي الديون التي أطلبها
+3 = 10% من الميزانية
+4 = 20% من الميزانية",
+        "1"
+      );
+      const map = { "1": "sum_items", "2": "debts_remaining", "3": "percent_10", "4": "percent_20" };
+      if (map[choice]) {
+        state.categories[idx].formula = map[choice];
+        saveState();
+      }
+    }
+
+    function deleteCategory(idx) {
+      if (state.categories.length <= 1) return alert("يجب الإبقاء على قسم واحد على الأقل");
+      state.categories.splice(idx, 1);
+      saveState();
+    }
+
+    document.getElementById("txDateInput").value = new Date().toISOString().slice(0, 10);
+    document.getElementById("debtDateInput").value = new Date().toISOString().slice(0, 10);
+    renderAll();
+  </script>
+</body>
+</html>
